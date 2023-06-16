@@ -1,0 +1,48 @@
+﻿Configuracion de Usuarios con Identity EF.
+
+Es una herramienta de EF que nos ayuda a la gestion de todo
+lo que tiene que ver con usuarios y su autenticacion como es:
+    CRUD, Inicio de seccion, password y reset, roles 
+    permisos, logeo y deslogueo, tablas de user, etc.
+
+Se requiere el paquete de:
+    Microsoft.AspNetCore.Identity.EntityFrameworkCore
+
+Uso:
+    Para poder hacer uso de identity lo primero a hacer es 
+    hacer que nuestro dbcontext ya no herede de DbContext 
+    sino de IdentityDbContext.
+
+    Debemos hacer migraciones.
+
+    El siguiente paso es inyectar y activar el servicio de 
+    Authentication en el proyecto, aca se configuran los 
+    metodos, puede ser email, o red sociales.
+
+        - builder.Services.AddAuthentication();
+
+    Tambien debemos inyectar, activar y conf los servicios basados 
+    en Identity para la autenticación y autorización, asi como
+    las demas funciones que ofrece identity.
+
+    builder.Services.AddIdentity<IdentityUser, IdentityRole>(opt => opt.SignIn.RequireConfirmedAccount = false)
+        .AddEntityFrameworkStores<AplicationDbContext>() 
+        .AddDefaultTokenProviders(); 
+
+    1 - configuramos un el sevicio de SignIn 
+    2 - Inyectamos el contexto para que trabaje en conjunto de EF Core. 
+    3 - Dejamos el provedor de tokes por defecto al que trae identity
+
+    Agregamos cofig adiciales a las opciones de identity como son el LoginPath y AccessDeniedPath
+        builder.Services.PostConfigure<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme,
+            opt =>
+            {
+                opt.LoginPath = "/usuarios/login";
+                opt.AccessDeniedPath = "/usuario/login";
+            });
+
+    Agregamos un middleware para trabajar con la data del usuario.
+    
+        app.UseAuthentication(); //antes del UseAuthorization
+         
+

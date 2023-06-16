@@ -1,0 +1,74 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer localizer;
+
+@{
+    ViewData["Title"] = "Listado Tareas";
+}
+
+<div class="text-center">
+    <h1 class="display-4">@localizer["Mis Tareas"]</h1>
+    <button type="button" class="btn btn-primary mb-3" onclick="agregarNuevaTareaAlListado()">@localizer["Nueva-Tarea"]</button>
+</div>
+
+<div id="contenedor-listado-tareas" class="text-center">
+
+    <div class="text-start" data-bind="foreach: tareas">
+        <div name="tarea" class="border mb-2 p-2" style="cursor:pointer">
+            <div data-bind="text: titulo, hidden: esNuevo" class="fw-blold">
+            </div>
+            <input type="text" name="titulo-tarea" data-bind="value: titulo, visible:esNuevo, event:{focusout: manejarFocusoutTituloTarea}" />
+        </div>
+    </div>
+
+    <div data-bind="visible: cargando" class="spinner-border">
+        @*<span class="vissually-hidden">Cargando...</span>*@
+    </div>
+
+    <div data-bind="visible: noHayTareas">
+        No hay tareas...
+    </div>
+
+</div>
+
+@section Scripts{
+    @*<script src="~/js/utilidades.js"></script>*@
+    <script asp-append-version="true" src="~/js/tareas.js"></script>
+    <script>
+
+        const urlTareas = "/api/tareas";
+
+        function tareasListadoViewModelFn(){
+            var self = this;// para mantener una referencia constante al ViewModel 
+            self.tareas = ko.observableArray([]); //Ya no son variables ya son propiedades 
+            self.cargando = ko.observable(true);
+
+            //propiedad especial que se derivan de una o más propiedades observables existentes
+            self.noHayTareas = ko.pureComputed(function(){
+                if(self.cargando()){ //Si carganfo es vedarero lo pasamos a falso
+                    return false;
+                }
+
+                return self.tareas().length === 0; //Vemos que sea igual a 0 si lo es con data-blin mostramos un mensaje 
+            });
+        }
+
+        function tareaElementoListadoViewModel({id, titulo}){
+            var self = this;
+            self.id = ko.observable(id);
+            self.titulo = ko.observable(titulo);
+            self.esNuevo = ko.pureComputed(function(){
+                return self.id() === 0;
+            });
+        }
+
+        const tareasListadoViewModel = new tareasListadoViewModelFn();
+
+            //Usamos setTimeout para actulizar el viewModel despues se cierto tiempo
+        setTimeout(()=>{
+            //tareasListadoViewModel.tareas.push({titulo: "tarea 1"}); //Agregamos item
+            tareasListadoViewModel.cargando(false); //cambiamo el estado de cargando a false
+        }, 1000);
+
+       ko.applyBindings(tareasListadoViewModel, document.getElementById('contenedor-listado-tareas'));
+    </script>
+}

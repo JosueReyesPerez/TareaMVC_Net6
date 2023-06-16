@@ -1,0 +1,49 @@
+﻿Validacion Por Frond end.
+
+Para la validacion por frond end se hara uso 
+de la libreria JQUERY que en conjunto de las
+razor page nos ayudaran a mostrar mensaje de 
+validacion o alertas o eventos.
+
+Validacion e Implementacion.
+
+Es necesario que dentro de nuestos inputs de
+formularios a validad pongamos una etiqueta 
+"span" con el atributo asp-validation-for
+
+	<span asp-validation-for="Model.Example"
+		class="text-danget"></span>
+
+Lo siguiente es agregar la libreria "Jquery 
+Validate" en la vista que queremos validar
+para eso debemos implementar una vista
+parcial que se encuenta en Views/Shared y se
+llama "_ValidationScriptsPartial.cshtml".
+	ESTA VISTA SOLO IMPLEMENTA LOS SCRIPT 
+	DE RELACION CON LA LIBRERIA DE JQUERY.
+
+	@section Scripts {
+	<partial name="_ValidationScriptsPartial"/>
+	}
+
+CUIDADO....
+si no estamos usando el _layout por defecto
+es necesario en el layout que usemos implementar
+en la seccion de scripts las librerias de JQUERY
+	"De preferencia todos los scrips de layout 
+		por defecto."
+
+tambien debemos agregar la secction de carga de 
+scrips.
+	"De preferencia si copear todo del layout 
+		principal"
+
+
+NOTA 02....
+si queremos que nuestras validaciones se muestren 
+debemos de activar las validaciones adiccionales, 
+para eso dentro de "_ValidationScriptsPartial" debemos
+referencial a additional-methods.min.js de jquery
+exemplo:
+<script src="~/lib/jquery-validation/dist/additional-methods.min.js">
+</script>

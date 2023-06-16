@@ -1,0 +1,4 @@
+﻿/*
+function mostrarError() {
+    alert(mensajeDeError);
+}*/

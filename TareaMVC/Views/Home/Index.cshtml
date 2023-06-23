@@ -12,11 +12,20 @@
 
 <div id="contenedor-listado-tareas" class="text-center">
 
-    <div class="text-start" data-bind="foreach: tareas">
-        <div name="tarea" class="border mb-2 p-2" style="cursor:pointer">
+    <div id="reordenable" class="text-start" data-bind="foreach: tareas">
+        <div name="tarea" class="border mb-2 p-2" style="cursor:pointer"
+            data-bind="click: manejarClickTarea">
             <div data-bind="text: titulo, hidden: esNuevo" class="fw-blold">
             </div>
-            <input type="text" name="titulo-tarea" data-bind="value: titulo, visible:esNuevo, event:{focusout: manejarFocusoutTituloTarea}" />
+
+            <div name="pasos-resumen" data-bind="visible: pasosTotal()>0">
+                <span data-bind="text:pasosRealizados"></span>/<span data-bind="text:pasosTotal"></span>
+                <span data-bind="text:porcentajeCompletado"></span>
+            </div>
+
+            <input type="text" name="titulo-tarea" data-bind="value: titulo, visible:esNuevo, 
+                attr: {'data-id':id},
+                event:{focusout: manejarFocusoutTituloTarea}" />
         </div>
     </div>
 
@@ -30,12 +39,18 @@
 
 </div>
 
+<partial name="_ModalEditarTarea" />
 @section Scripts{
     @*<script src="~/js/utilidades.js"></script>*@
+    <script asp-append-version="true" src="~/js/utilidades.js"></script>
     <script asp-append-version="true" src="~/js/tareas.js"></script>
+    <script asp-append-version="true" src="~/js/pasos.js"></script>
     <script>
 
         const urlTareas = "/api/tareas";
+        const urlPasos = "/api/Pasos";
+        const modalEditarTarea = document.getElementById('modal-editar-tarea');
+        const modalEditarTareaBoostrap = new bootstrap.Modal(modalEditarTarea);
 
         function tareasListadoViewModelFn(){
             var self = this;// para mantener una referencia constante al ViewModel 
@@ -52,23 +67,48 @@
             });
         }
 
-        function tareaElementoListadoViewModel({id, titulo}){
+        function tareaElementoListadoViewModel({id, titulo, pasosTotal, pasosRealizados}){
             var self = this;
             self.id = ko.observable(id);
             self.titulo = ko.observable(titulo);
+
+            self.pasosTotal = ko.observable(pasosTotal);
+            self.pasosRealizados = ko.observable(pasosRealizados);
+
             self.esNuevo = ko.pureComputed(function(){
                 return self.id() === 0;
+            });
+
+            self.porcentajeCompletado = ko.pureComputed(function(){
+                const calculo = Math.round(self.pasosRealizados() * 1.0 / self.pasosTotal() * 100);
+                return `(${calculo}%)`;
             });
         }
 
         const tareasListadoViewModel = new tareasListadoViewModelFn();
 
-            //Usamos setTimeout para actulizar el viewModel despues se cierto tiempo
-        setTimeout(()=>{
-            //tareasListadoViewModel.tareas.push({titulo: "tarea 1"}); //Agregamos item
-            tareasListadoViewModel.cargando(false); //cambiamo el estado de cargando a false
-        }, 1000);
+        const tareaEditarViewModel = {
+            id: 0, 
+            titulo: ko.observable(''), 
+            descripcion: ko.observable(''), 
+            pasos: ko.observableArray([])
+        }
 
-       ko.applyBindings(tareasListadoViewModel, document.getElementById('contenedor-listado-tareas'));
+        function pasoViewModel({id, descripcion, realizado, modoEdicion}){
+            var self = this;
+            self.id = ko.observable(id || 0);
+            self.descripcion = ko.observable(descripcion || '');
+            self.descripcionAnterior = '';
+            self.realizado = ko.observable(realizado);
+            self.modoEdicion = ko.observable(modoEdicion);
+            self.esNuevo = ko.pureComputed(function(){
+                return self.id() == 0;
+            });
+        }
+
+        obtenerTareas();
+
+        ko.applyBindings(tareasListadoViewModel, document.getElementById('contenedor-listado-tareas'));
+        ko.applyBindings(tareaEditarViewModel, document.getElementById('modal-editar-tarea'));
     </script>
 }

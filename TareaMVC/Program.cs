@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
+using System.Text.Json.Serialization;
 using TareaMVC;
 using TareaMVC.Services;
 
@@ -21,6 +22,9 @@ builder.Services.AddControllersWithViews(opt => {  //implementamos en el filtro 
 }).AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix) //Sercivio de IView Localizer 
 .AddDataAnnotationsLocalization(opt => {
     opt.DataAnnotationLocalizerProvider = (_, factoria) => factoria.Create(typeof(RecursoCompartido));
+    }).AddJsonOptions(opt =>
+    {
+        opt.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
 
 
@@ -43,6 +47,8 @@ builder.Services.PostConfigure<CookieAuthenticationOptions>(IdentityConstants.Ap
 builder.Services.AddLocalization(opt => { opt.ResourcesPath = "Recursos"; });
 
 builder.Services.AddTransient<IServicioUsuarios, ServicioUsuarios>();
+
+builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TareaMVC;
 
@@ -11,9 +12,11 @@ using TareaMVC;
 namespace TareaMVC.Migrations
 {
     [DbContext(typeof(AplicationDbContext))]
-    partial class AplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230619020637_correccion-Tareas")]
+    partial class correccionTareas
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -263,9 +266,6 @@ namespace TareaMVC.Migrations
 
                     b.Property<int>("Orden")
                         .HasColumnType("int");
-
-                    b.Property<bool>("Realizado")
-                        .HasColumnType("bit");
 
                     b.Property<int>("TareaId")
                         .HasColumnType("int");

@@ -45,6 +45,7 @@
     <script asp-append-version="true" src="~/js/utilidades.js"></script>
     <script asp-append-version="true" src="~/js/tareas.js"></script>
     <script asp-append-version="true" src="~/js/pasos.js"></script>
+    <script asp-append-version="true" src="~/js/archivos-adjuntos.js"></script>
     <script>
 
         const urlTareas = "/api/tareas";
@@ -91,7 +92,8 @@
             id: 0, 
             titulo: ko.observable(''), 
             descripcion: ko.observable(''), 
-            pasos: ko.observableArray([])
+            pasos: ko.observableArray([]), 
+                archivosAdjuntos: ko.observableArray([]), 
         }
 
         function pasoViewModel({id, descripcion, realizado, modoEdicion}){
